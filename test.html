@@ -1,0 +1,38 @@
+<canvas width="1000"></canvas>
+<script type="text/javascript">
+	can = document.querySelector("canvas");
+	c = can.getContext("2d");
+	var color = [255,0,0];
+	var active = 0;
+	var mode = -1;
+
+	function getNextColor(colors, incr=1) {
+		colors = colors.map(c => { return (c < 0) ? 0 : (c > 255) ? 255 : c })
+
+		let hex = colors.map(c => {return c / 255;});
+
+		if ( hex.filter(h => {return h<1 && h>0}).length == 0 )
+			if (hex.join("").match(/[1]/g).length == 2) {
+				active = (hex.indexOf(0) == 1)
+					? 2
+					: hex.indexOf(1);
+				mode = -1;
+			}
+			else {
+				active = (hex.indexOf(1) + 1) % 3;
+				mode = 1;
+			}
+
+		colors[active] += mode * incr;
+
+		return colors;
+	}
+
+	for (let i=0; i<can.clientWidth; i++) {
+		color = getNextColor(color, 2)
+		c.beginPath();
+			c.fillStyle = "rgb("+color.join(",")+")";
+			c.fillRect(i,0,1,can.clientHeight)
+		c.closePath();
+	}
+</script>

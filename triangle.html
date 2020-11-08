@@ -3,6 +3,8 @@
 <link rel="stylesheet" type="text/css" href="styles/main.css">
 <script type="text/javascript" src="scripts/canvas.js"></script>
 <script type="text/javascript">
+	var partyMode = false;
+
 	window.onload = () => {
 		let canvas = new Canvas("canvas", {scale: "full"});
 
@@ -52,8 +54,10 @@
 				ctx.lineTo(x2,y2);
 				ctx.lineTo(sx,sy);
 				ctx.stroke();
-				ctx.fillStyle = randColor();
-				// ctx.fill();
+				if (partyMode) {
+					ctx.fillStyle = randColor();
+					ctx.fill();
+				}
 			ctx.closePath();
 
 			return {
@@ -65,4 +69,17 @@
 	}
 
 </script>
+<button 
+	style="position: fixed;
+		   top: 0px;
+		   left: 0px;"
+	onclick="
+		partyMode = (partyMode+1)%2;
+		this.children[0].innerText = partyMode
+			? 'on'
+			: 'off';
+	"
+>
+	party mode: <span>off</span>
+</button>
 <canvas id="canvas"></canvas>

@@ -1,6 +1,8 @@
 <meta charset="utf-8">
+<script type="text/javascript" src="scripts/get_next_color.js"></script>
 <script type="text/javascript">
 	var ctx, W, H, N=1, points;
+	var colorMode = false;
 	window.onload = () => {
 		let canvas = document.getElementById("canvas");
 		W = document.body.clientWidth,
@@ -12,38 +14,8 @@
 		ctx = canvas.getContext("2d");		
 	}
 
-	function test() {
-		let cx = W/2,
-			cy = H/2,
-			r = 150;
-
-		ctx.beginPath();
-			ctx.fillStyle = "pink";
-			ctx.arc(cx,cy,3,0,2*Math.PI,true)
-			ctx.fill();
-		ctx.closePath();
-
-		for (let i=-Math.PI; i<Math.PI; i+=Math.PI/4) {
-			let x = cx + r*Math.cos(i),
-				y = cy + r*Math.sin(i);
-
-			ctx.beginPath();
-				ctx.fillStyle = "lime";
-				ctx.arc(x,y,3,0,2*Math.PI,true)
-				ctx.fill();
-			ctx.closePath();
-
-			ctx.beginPath();
-				ctx.font="14px Georgia";
-				ctx.fillStyle="grey";
-				ctx.fillText(i,x,y);
-			ctx.closePath();
-		}		
-	}
-
 	function change(num) {
 		ctx.clearRect(0,0,W,H);
-		console.clear();
 
 		lineAmp = 0.5;
 		N = (N<0) ? 0 : (N+num);
@@ -54,15 +26,20 @@
 
 		points = dragon(points, N);
 
-		ctx.beginPath();
-			ctx.strokeStyle = "black";
-			ctx.moveTo(points[0][0], points[0][1]);
-			for (pt of points) {
-				ctx.lineTo(pt[0], pt[1]);
-			}
+		color = colorMode
+			? [255,0,0]
+			: [0,0,0];
 
-			ctx.stroke();
-		ctx.closePath();
+		for (let i=1; i<points.length; i++) {
+			ctx.beginPath();
+				ctx.strokeStyle = "rgb("+color.join(",")+")";
+				ctx.moveTo(points[i-1][0], points[i-1][1]);
+				ctx.lineTo(points[i][0], points[i][1]);
+				ctx.stroke();
+			ctx.closePath();
+
+			if (colorMode) color = getNextColor(color, .01);
+		}
 	}
 
 	function dragon(arr, count) {
@@ -75,7 +52,6 @@
 					yc = out[last][1],
 					deg90 = [];
 				
-				console.log("---------------")
 				for (i=last-1; i>=0; i--) {
 					let x_old = out[i][0],
 						y_old = out[i][1];
@@ -96,6 +72,7 @@
 		}
 
 		start(count);
+
 		return out;
 	}
 </script> 
@@ -117,6 +94,6 @@
 <div id="control">
 	<button onclick="change(-1)">-</button>
 	<button onclick="change(1)" >+</button>
-	<button onclick="test()" >T</button>
+	<button onclick="colorMode = (colorMode+1)%2; change(0)">C</button>
 </div>
 <canvas id="canvas"></canvas>
