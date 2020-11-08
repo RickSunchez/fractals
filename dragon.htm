@@ -1,0 +1,122 @@
+<meta charset="utf-8">
+<script type="text/javascript">
+	var ctx, W, H, N=1, points;
+	window.onload = () => {
+		let canvas = document.getElementById("canvas");
+		W = document.body.clientWidth,
+		H = document.body.clientHeight;
+
+		canvas.width  = W;
+		canvas.height = H;
+
+		ctx = canvas.getContext("2d");		
+	}
+
+	function test() {
+		let cx = W/2,
+			cy = H/2,
+			r = 150;
+
+		ctx.beginPath();
+			ctx.fillStyle = "pink";
+			ctx.arc(cx,cy,3,0,2*Math.PI,true)
+			ctx.fill();
+		ctx.closePath();
+
+		for (let i=-Math.PI; i<Math.PI; i+=Math.PI/4) {
+			let x = cx + r*Math.cos(i),
+				y = cy + r*Math.sin(i);
+
+			ctx.beginPath();
+				ctx.fillStyle = "lime";
+				ctx.arc(x,y,3,0,2*Math.PI,true)
+				ctx.fill();
+			ctx.closePath();
+
+			ctx.beginPath();
+				ctx.font="14px Georgia";
+				ctx.fillStyle="grey";
+				ctx.fillText(i,x,y);
+			ctx.closePath();
+		}		
+	}
+
+	function change(num) {
+		ctx.clearRect(0,0,W,H);
+		console.clear();
+
+		lineAmp = 0.5;
+		N = (N<0) ? 0 : (N+num);
+		points = [];
+
+		points.push([W/2, H/2]);
+		points.push([W/2, H/2 - lineAmp]);
+
+		points = dragon(points, N);
+
+		ctx.beginPath();
+			ctx.strokeStyle = "black";
+			ctx.moveTo(points[0][0], points[0][1]);
+			for (pt of points) {
+				ctx.lineTo(pt[0], pt[1]);
+			}
+
+			ctx.stroke();
+		ctx.closePath();
+	}
+
+	function dragon(arr, count) {
+		let out = arr;
+		
+		function start(count) {
+			if (count > 0) {
+				let last = out.length - 1,
+					xc = out[last][0],
+					yc = out[last][1],
+					deg90 = [];
+				
+				console.log("---------------")
+				for (i=last-1; i>=0; i--) {
+					let x_old = out[i][0],
+						y_old = out[i][1];
+
+					let ang = Math.PI/2;
+					x = xc + (x_old-xc)*Math.cos(ang) - (y_old-yc)*Math.sin(ang)
+					y = yc + (x_old-xc)*Math.sin(ang) + (y_old-yc)*Math.cos(ang)
+
+					deg90.push([x,y]);
+				}
+
+				out = out.concat(deg90);
+
+				count--;
+
+				start(count);
+			}
+		}
+
+		start(count);
+		return out;
+	}
+</script> 
+<style type="text/css">
+	* {
+		margin: 0px;
+		padding: 0px;
+	}
+	#control {
+		position: fixed;
+		top: 0px;
+		left: 0px;
+	}
+	#control button {
+		width: 50px;
+		height: 50px;
+	}
+</style>
+<div id="control">
+	<button onclick="change(-1)">-</button>
+	<button onclick="change(1)" >+</button>
+	<button onclick="test()" >T</button>
+</div>
+<canvas id="canvas"></canvas>
