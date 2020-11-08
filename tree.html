@@ -1,0 +1,69 @@
+<meta charset="utf-8">
+<title>tree</title>
+
+<link rel="stylesheet" type="text/css" href="styles/main.css">
+<script type="text/javascript" src="scripts/canvas.js"></script>
+<script type="text/javascript">
+	window.onload = () => {
+		let canvas = new Canvas("canvas", {scale: "full"});
+
+		drawTree(canvas);
+	}
+
+	function drawTree(field) {
+		let ctx = field.context,
+			dAngle = 16,
+			dScale = 0.1;
+
+		fractal(field.width / 2, field.height, 1.5, 0)
+
+		function fractal(x,y,scale,angle) {
+			if ( scale <= 0 ) return false;
+
+			let pts = baseElem(x,y, scale, angle);
+
+			fractal(pts.left[0],  pts.left[1],  scale-dScale, angle-dAngle);
+			fractal(pts.right[0], pts.right[1], scale-dScale, angle+dAngle);
+		}
+
+		function baseElem(x,y, scale, angle) {
+			let innerRadius = 15,
+				outerRadius = 40;
+			let fh = innerRadius*scale,
+				sh = outerRadius*scale;
+
+			//	 x2,y2   x3,y3
+			//		\     /
+			//		 \   /
+			//		  \ /
+			// 		 x1,y1
+			// 		   |
+			// 		   |
+			// 		 sx,sy
+
+			let sx = x,
+				sy = y,
+				x1 = sx + fh * Math.cos(Math.PI*(angle-90)/180),
+				y1 = sy + fh * Math.sin(Math.PI*(angle-90)/180),
+				x2 = sx + sh * Math.cos(Math.PI*(angle-100)/180),
+				y2 = sy + sh * Math.sin(Math.PI*(angle-100)/180),
+				x3 = sx + sh * Math.cos(Math.PI*(angle-80)/180),
+				y3 = sy + sh * Math.sin(Math.PI*(angle-80)/180);
+
+			ctx.beginPath();
+				ctx.moveTo(x, y);
+				ctx.lineTo(x1, y1);
+				ctx.lineTo(x2, y2);
+				ctx.moveTo(x1, y1);
+				ctx.lineTo(x3, y3);
+				ctx.stroke();
+			ctx.closePath();
+
+			return {
+				left:  [x2, y2],
+				right: [x3, y3]
+			};
+		}
+	}
+</script>
+<canvas id="canvas"></canvas>

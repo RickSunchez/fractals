@@ -1,0 +1,68 @@
+<meta charset="utf-8">
+<title>triangle</title>
+<link rel="stylesheet" type="text/css" href="styles/main.css">
+<script type="text/javascript" src="scripts/canvas.js"></script>
+<script type="text/javascript">
+	window.onload = () => {
+		let canvas = new Canvas("canvas", {scale: "full"});
+
+		setInterval(update, 10, canvas);
+	}
+
+	var s = 3,
+		ds = 0.01;
+	function update(canvas) {
+		canvas.clear();
+		drawTriangle(canvas, s);
+		s += ds;
+
+		if (s > 7.5 || s < 3) ds *= -1;
+	}
+
+	function drawTriangle(canvas, sc) {
+		let ctx = canvas.context,
+			dAngle = 120,
+			dScale = sc;
+
+		fractal(canvas.width / 2, 0, 15, 0);
+
+		function fractal(x,y,scale,angle) {
+			if ( scale <= 0 ) return false;
+
+			let pts = baseElem(x,y,scale,angle);
+
+			fractal(pts.base[0], pts.base[1], scale-dScale, angle);
+			fractal(pts.pt1[0],  pts.pt1[1], scale-dScale, angle-dAngle);
+			fractal(pts.pt2[0],  pts.pt2[1], scale-dScale, angle+dAngle);
+		}
+
+		function baseElem(x,y,scale,angle) {
+			let r = 50*scale;
+
+			let sx = x,
+				sy = y,
+				x1 = sx + r * Math.cos((120+angle)*Math.PI/180),
+				y1 = sy + r * Math.sin((120+angle)*Math.PI/180),
+				x2 = sx + r * Math.cos((60+angle)*Math.PI/180),
+				y2 = sy + r * Math.sin((60+angle)*Math.PI/180);
+
+			ctx.beginPath();
+				ctx.moveTo(sx,sy);
+				ctx.lineTo(x1,y1);
+				ctx.lineTo(x2,y2);
+				ctx.lineTo(sx,sy);
+				ctx.stroke();
+				ctx.fillStyle = randColor();
+				// ctx.fill();
+			ctx.closePath();
+
+			return {
+				base: [sx,sy],
+				pt1:  [x1,y1],
+				pt2:  [x2,y2]
+			}
+		}
+	}
+
+</script>
+<canvas id="canvas"></canvas>
