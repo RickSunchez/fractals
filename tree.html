@@ -3,17 +3,30 @@
 
 <link rel="stylesheet" type="text/css" href="styles/main.css">
 <script type="text/javascript" src="scripts/canvas.js"></script>
+<script type="text/javascript" src="scripts/get_next_color.js"></script>
 <script type="text/javascript">
+	var colorMode = false;
 	window.onload = () => {
 		let canvas = new Canvas("canvas", {scale: "full"});
 
 		drawTree(canvas);
+
+		document
+			.querySelector("button")
+			.addEventListener("click", (ev) => {
+				colorMode = (colorMode+1)%2;
+				drawTree(canvas);
+			})
 	}
 
 	function drawTree(field) {
 		let ctx = field.context,
 			dAngle = 16,
 			dScale = 0.1;
+
+		var color = colorMode
+			? [255,0,0]
+			: [0,0,0];
 
 		fractal(field.width / 2, field.height, 1.5, 0)
 
@@ -50,7 +63,9 @@
 				x3 = sx + sh * Math.cos(Math.PI*(angle-80)/180),
 				y3 = sy + sh * Math.sin(Math.PI*(angle-80)/180);
 
+
 			ctx.beginPath();
+				ctx.strokeStyle = "rgb("+color.join(",")+")";
 				ctx.moveTo(x, y);
 				ctx.lineTo(x1, y1);
 				ctx.lineTo(x2, y2);
@@ -59,6 +74,7 @@
 				ctx.stroke();
 			ctx.closePath();
 
+			if (colorMode) color = getNextColor(color, 1);
 			return {
 				left:  [x2, y2],
 				right: [x3, y3]
@@ -66,4 +82,15 @@
 		}
 	}
 </script>
+<style type="text/css">
+	button {
+		width: 50px;
+		height: 50px;
+		position: fixed;
+		top: 0px;
+		left: 0px;
+		padding: 0px;
+	}
+</style>
+<button>C</button>
 <canvas id="canvas"></canvas>
